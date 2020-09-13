@@ -1,0 +1,7 @@
+"0","for (var in c('neighbourhood_group','room_type')){"
+"0","  plt<-ggplot(nyc_airbnb_clean,"
+"0","  aes_string(y='log_price',x=var,fill=var"
+"0","      ))+"
+"0","  geom_violin()"
+"0","  show(plt)"
+"0","}"
