@@ -1,6 +1,0 @@
-"0",""
-"0","nyc_airbnb_clean%>%"
-"0","  group_by(neighbourhood_group)%>%"
-"0","  summarise(mean_scores=mean(sqrt_review_scores_location))"
-"2","`summarise()` ungrouping output (override with `.groups` argument)
-"

@@ -11,6 +11,7 @@ always_allow_html: true
 library(tidyverse)
 library(p8105.datasets)
 library(car)
+library(gridExtra)
 library(leaflet)
 data('nyc_airbnb')
 ```
@@ -31,23 +32,41 @@ nyc_airbnb_clean <- nyc_airbnb %>%
     log_number_of_reviews=log(number_of_reviews)
     )
 skimr::skim(nyc_airbnb_clean)
+
+```
+
+In order to look at the relationship with review's scores. But first we should notice there's extreme left skewness in scores, even though adjusted with square roof.
+
+```{r analysis on review}
 pairs(~sqrt_review_scores_location+log_price+log_number_of_reviews,nyc_airbnb_clean)
 
 nyc_airbnb_clean%>%
   group_by(neighbourhood_group)%>%
   summarise(mean_scores=mean(sqrt_review_scores_location))
 
+plt=c()
+for (i in c(1:2)){
+  var=c('neighbourhood_group','room_type')[[i]]
+  plt[[i]]<-ggplot(nyc_airbnb_clean,
+  aes_string(y='sqrt_review_scores_location',x = var, fill=var
+      ))+
+  geom_boxplot()
+}
+grid.arrange(plt[[1]],plt[[2]],ncol=1)
+
 ```
 
 # Question 2 on price
 ```{r price_relation,message=FALSE,collapse=TRUE}
-for (var in c('neighbourhood_group','room_type')){
-  plt<-ggplot(nyc_airbnb_clean,
+plt=c()
+for (i in c(1:2)){
+  var=c('neighbourhood_group','room_type')[[i]]
+  plt[[i]]<-ggplot(nyc_airbnb_clean,
   aes_string(y='log_price',x=var,fill=var
       ))+
   geom_violin()
-  show(plt)
 }
+grid.arrange(plt[[1]],plt[[2]],ncol=1)
 ```
 
 
@@ -67,7 +86,7 @@ map_data <- nyc_airbnb_clean%>%
 m <- leaflet::leaflet(map_data)%>%
   addProviderTiles(providers$CartoDB.Positron) %>% #addTiles()%>%
   addCircles(
-    ~long,~lat,popup=~as.character(rental_locate),label=~neighbourhood,
+    lat=~long,lng = ~lat,popup=~as.character(rental_locate),label=~neighbourhood,
     radius = ~sqrt(rental_locate)*40,weight=1
   )
   #addMarkers(~long,~lat,popup = ~host_name,label = ~review_scores_location)
